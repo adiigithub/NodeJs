@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+      function sendRequest(){
+        const a = document.getElementById("a").value;
+        const b= document.getElementById("b").value
+        async function featch() {
+            const result=await fetch("http://localhost:5555/sum",{
+                method:"POST",
+                headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ a: Number(a), b: Number(b) })
+            })
+            const data=await result.json()
+            console.log(data)
+            alert("sum :",data.sum)
+        }
+        featch()
+      }
+    </script>
+</head>
+<body>
+    <input id="a" type="number" placeholder="enter a "></input>
+       <input id="b" type="number" placeholder="enter b "></input>
+       <button onclick="sendRequest()">click it</button>
+    
+</body>
+</html>
