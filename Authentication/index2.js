@@ -1,12 +1,14 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "randomthingsHappen";
+const JWT_SECRET = "thatisasecretkey";
 
 const app = express();
-
 app.use(express.json());
 
 const users = [];
+app.get('/',(req,res)=>{
+    res.sendFile(__dirname +"/public/index.html")
+})
 
 app.post("/signup", (req, res) => {
   const username = req.body.username;
@@ -21,7 +23,6 @@ app.post("/signup", (req, res) => {
     msg: "you are signedup",
   });
 });
-
 app.post("/signin", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -40,23 +41,33 @@ app.post("/signin", (req, res) => {
       },
       JWT_SECRET
     );
-
     res.json({
       token: token,
     });
+    console.log(token);
   } else {
-    res.status(403).send({
-      msg: "invailid user name or password",
+    res.status(403).json({
+      msg: "invalid username or password",
     });
   }
 });
 
-app.get("/me", (req, res) => {
+const auth = (req, res, next) => {
   const token = req.headers.token;
   const decodedInformation = jwt.verify(token, JWT_SECRET);
-  const username = decodedInformation.username;
+  if (decodedInformation.username) {
+    req.username=decodedInformation.username
+    next();
+  } else {
+    res.json({
+      message: "you are not logged in",
+    });
+  }
+};
+
+app.get("/me",auth,(req, res) => {
   let user = users.find((u) => {
-    if (u.username === username) {
+    if (u.username === req.username) {
       return true;
     }
   });
@@ -67,11 +78,11 @@ app.get("/me", (req, res) => {
     });
   } else {
     res.json({
-      msg: "token invalid",
+      msg: "invaid username",
     });
   }
 });
 
-app.listen(3000, () => {
-  console.log(`server run in ${3000}`);
+app.listen(4444, () => {
+  console.log(`server runs in port ${4444}`);
 });

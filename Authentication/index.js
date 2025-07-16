@@ -8,15 +8,6 @@ const app=express()
 app.use(express.json())
 
 
-function generateToken(){
-    let a=["a","b","c","d","1","2","3","4"];
-    let token=""
-    for(let i=0;i<a.length;i++){
-        token +=a[Math.floor(Math.random()*a.length)]
-       
-    } console.log(token)
-    return token
-}  
 const users=[];
 
  
@@ -46,8 +37,10 @@ const user=users.find((u)=>{
     }
 })
 if(user){
-    const token=generateToken();
-    user.token=token;
+    const token=jwt.sign({
+        username:username
+    },JWT_SECRET);
+    
     res.json({
         token:token
     })
@@ -61,8 +54,10 @@ if(user){
 
 app.get('/me',(req,res)=>{
     const token = req.headers.token
+    const decodedInformation=jwt.verify(token,JWT_SECRET)
+    const username=decodedInformation.username
     let user=users.find(u=>{
-        if(u.token===token){
+        if(u.username===username){
             return true
         }
     })
